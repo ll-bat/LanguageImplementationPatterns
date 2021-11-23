@@ -1,17 +1,13 @@
-from Constants import EOF
+from Constants import *
 from Lexer import Lexer
 from Parser import Parser
-
-# lexer = Lexer("1 + 2 * 3 / (1 + 2)")
-#
-# while lexer.get_current_token().type is not EOF:
-#     a = lexer.get_current_token()
-#     print(a)
-#     lexer.get_next_token()
+from Interpreter import Interpreter
 
 try:
-    parser = Parser("1 + 2 * 3 / (1 + 2) ")
+    parser = Parser("2 + 2 * 2 + 2 * (2 + 0)")
     tree = parser.parse()
-    print(tree)
+    interpreter = Interpreter(tree)
+    value = interpreter.interpret()
+    print(value)
 except SyntaxError as ex:
     pass

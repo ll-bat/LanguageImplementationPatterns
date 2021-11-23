@@ -28,3 +28,11 @@ class BinOp(AST):
 
     def __str__(self):
         return f'BinOp({self.left}, {self.op.type}, {self.right})'
+
+
+class NodeVisitor(object):
+    def visit(self, node):
+        class_name = type(node).__name__
+        method_name = 'visit_' + class_name
+        method = getattr(self, method_name)
+        return method(node)
