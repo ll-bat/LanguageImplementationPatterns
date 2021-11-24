@@ -39,11 +39,12 @@ class Parser:
         token = self.lexer.get_current_token()
         if token.type is BEGIN:
             return self.compound_statement()
-        elif token.type is ASSIGN:
+        elif token.type is ID:
             return self.assignment_statement()
         elif token.type is END:
             return self.emtpy()
 
+        print(token)
         self.error("error in statement")
 
     def assignment_statement(self):
@@ -52,13 +53,14 @@ class Parser:
         expr = self.expr()
         return Assign(var, Token(ASSIGN, Assign), expr)
 
-    def emtpy(self):
-        self.lexer.go_forward()
+    @staticmethod
+    def emtpy():
         return NoOp()
 
     def variable(self):
         token = self.lexer.get_current_token()
         if token.type is ID:
+            self.lexer.go_forward()
             return Var(token)
 
         self.error("error in variable")
@@ -117,8 +119,9 @@ class Parser:
             self.error("incorrect expression: (from factor)")
 
     def parse(self):
-        expr = self.program()
+        program = self.program()
         if self.lexer.is_pointer_out_of_text():
             # all characters consumed
-            return expr
+            return program
+
         self.error("Syntax error at position " + self.lexer.get_position())

@@ -4,16 +4,20 @@ from Constants import *
 from Lexer import Lexer
 
 try:
-    lexer = Lexer("BEGIN"
-                  " "
-                  "x := 2;"
-                  "y := x + 2 * (x + 2);"
-                  "END . ")
+    string = """
+        BEGIN
+            BEGIN
+                number := 2;
+                a := number;
+                b := 10 * a + 10 * number / 4;
+                c := a - - b
+            END;
+            x := 11;
+        END.
+    """
 
-    while lexer.get_current_token().type is not EOF:
-        token = lexer.get_current_token()
-        print(token)
-        lexer.get_next_token()
-
+    parser = Parser(string)
+    tree = parser.parse()
+    print(tree)
 except SyntaxError as ex:
     print(ex.msg)

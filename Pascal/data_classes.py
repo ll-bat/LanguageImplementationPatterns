@@ -54,6 +54,13 @@ class Compound(AST):
     def add(self, node):
         self.children.append(node)
 
+    def __str__(self):
+        res = ""
+        for node in self.children:
+            res += str(node) + ", "
+
+        return f'Compound({res})'
+
 
 class Var(AST):
     def __init__(self, token: Token):
@@ -61,7 +68,7 @@ class Var(AST):
         self.value = token.value
 
     def __str__(self):
-        return f''
+        return f'Var({self.value})'
 
 
 class Assign(AST):
@@ -75,4 +82,5 @@ class Assign(AST):
 
 
 class NoOp(AST):
-    pass
+    def __str__(self):
+        return 'NoOp()'
