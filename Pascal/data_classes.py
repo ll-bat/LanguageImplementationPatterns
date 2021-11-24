@@ -54,6 +54,9 @@ class Compound(AST):
     def add(self, node):
         self.children.append(node)
 
+    def get_children(self):
+        return self.children
+
     def __str__(self):
         res = ""
         for node in self.children:

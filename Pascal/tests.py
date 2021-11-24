@@ -18,6 +18,8 @@ try:
 
     parser = Parser(string)
     tree = parser.parse()
-    print(tree)
+    interpreter = Interpreter(tree)
+    value = interpreter.interpret()
+    print(value)
 except SyntaxError as ex:
     print(ex.msg)

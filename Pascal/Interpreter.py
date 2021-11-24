@@ -1,10 +1,11 @@
-from data_classes import NodeVisitor, BinOp, UnaryOp, Token
+from data_classes import *
 from Constants import *
 
 
 class Interpreter(NodeVisitor):
     def __init__(self, tree):
         self.tree = tree
+        self.GLOBAL_VARS = {}
 
     def visit_BinOp(self, node: BinOp):
         left = self.visit(node.left)
@@ -29,8 +30,27 @@ class Interpreter(NodeVisitor):
             return -self.visit(expr)
 
     @staticmethod
-    def visit_Num(node):
+    def visit_Num(node: Num):
         return node.value
+
+    def visit_Compound(self, node: Compound):
+        for sub_node in node.get_children():
+            self.visit(sub_node)
+
+    def visit_Assign(self, node: Assign):
+        var_name = node.left.value
+        expr = self.visit(node.right)
+        self.GLOBAL_VARS[var_name] = expr
+
+    def visit_Var(self, node: Var):
+        var_name = node.value
+        value = self.GLOBAL_VARS.get(var_name, None)
+        if value is None:
+            raise SyntaxError("variable '" + var_name + "' is not defined")
+        return value
+
+    def visit_NoOp(self, node):
+        pass
 
     def interpret(self):
         return self.visit(self.tree)
