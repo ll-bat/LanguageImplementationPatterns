@@ -16,7 +16,8 @@ class Interpreter(NodeVisitor):
             PLUS: lambda x, y: x + y,
             MINUS: lambda x, y: x - y,
             MULT: lambda x, y: x * y,
-            DIV: lambda x, y: x / y,
+            INTEGER_DIV: lambda x, y: x // y,
+            FLOAT_DIV: lambda x, y: x / y,
         }
 
         return types[operator](left, right)
@@ -50,6 +51,14 @@ class Interpreter(NodeVisitor):
         return value
 
     def visit_NoOp(self, node):
+        pass
+
+    def visit_Program(self, node: Program):
+        for declaration in node.var_decs:
+            self.visit(declaration)
+        self.visit(node.compound_statement)
+
+    def visit_VarDecs(self, node: VarDecs):
         pass
 
     def interpret(self):

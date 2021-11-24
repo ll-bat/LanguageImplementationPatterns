@@ -29,9 +29,15 @@ try:
             END.  {Part10}
     """
 
-    lexer = Lexer(string)
-    while lexer.get_current_token().type is not EOF:
-        print(lexer.get_current_token())
-        lexer.get_next_token()
+    # lexer = Lexer(string)
+    # while lexer.get_current_token().type is not EOF:
+    #     print(lexer.get_current_token())
+    #     lexer.go_forward()
+
+    parser = Parser(string)
+    tree = parser.parse()
+    interpreter = Interpreter(tree)
+    value = interpreter.interpret()
+    print(value)
 except SyntaxError as ex:
     print(ex.msg)

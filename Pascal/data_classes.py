@@ -87,3 +87,27 @@ class Assign(AST):
 class NoOp(AST):
     def __str__(self):
         return 'NoOp()'
+
+
+class VarDecs(AST):
+    def __init__(self, variables, integer_type: Token):
+        self.variables = variables
+        self.token = self.type = integer_type
+
+    def __str__(self):
+        res = ""
+        for var in self.variables:
+            res += var.value + ', '
+        return f'VarDecs(({res}), {self.type.value})'
+
+
+class Program(AST):
+    def __init__(self, var_decs: list, compound_statement: Compound):
+        self.var_decs = var_decs
+        self.compound_statement = compound_statement
+
+    def __str__(self):
+        res = ""
+        for dec in self.var_decs:
+            res += str(dec) + ", "
+        return f'Program({res}, {self.compound_statement})'

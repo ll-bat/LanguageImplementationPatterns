@@ -75,7 +75,7 @@ class Lexer:
             "+": PLUS,
             "-": MINUS,
             "*": MULT,
-            "/": DIV,
+            "/": FLOAT_DIV,
             "(": LPARENT,
             ")": RPARENT
         }
@@ -142,39 +142,47 @@ class Lexer:
         if self.is_digit(cur_char):
             # NUMBER
             self.current_token = self._number()
+            return self.current_token
         elif cur_char.isalpha():
             # ID
             self.current_token = self._id()
+            return self.current_token
         elif self.is_operator(cur_char):
             # OPERATOR (+-*/())
             self.advance()
             self.current_token = Token(self.get_char_type(cur_char), cur_char)
+            return self.current_token
         elif cur_char == '.':
             # DOT
             self.advance()
             self.current_token = Token(DOT, DOT)
+            return self.current_token
         elif cur_char == ';':
             # SEMI
             self.advance()
             self.current_token = Token(SEMI, SEMI)
+            return self.current_token
         elif cur_char == ":" and self.peek() == "=":
             # ASSIGNMENT
             self.advance()
             self.advance()
             self.current_token = Token(ASSIGN, ASSIGN)
+            return self.current_token
         elif cur_char == "{":
             self.skip_comment()
             return self.get_next_token()
         elif cur_char == ":":
             self.advance()
             self.current_token = Token(COLON, COLON)
+            return self.current_token
         elif cur_char == ',':
             self.advance()
             self.current_token = Token(COMMA, COMMA)
+            return self.current_token
         else:
             if cur_char.isspace():
                 while self.get_current_character() is not None and self.get_current_character().isspace():
                     self.advance()
                 return self.get_next_token()
             self.error('syntax error "' + cur_char + '" is not valid character')
-        return self.current_token
+        self.error('unrecognized character ' + cur_char)

@@ -6,15 +6,19 @@ from data_classes import *
 class Parser:
     """
     --------- GRAMMAR ---------------
-    program: compound_statement DOT
+    program: PROGRAM variable SEMI block DOT
+    block: declarations compound_statement
+    declarations: VAR (variable_declaration SEMI)+ | empty
+    variable_declaration: ID (COMMA, ID)* COLON integer_type
+    integer_type: INTEGER | REAL
     compound_statement: BEGIN statement_list END
-    statement_list: statement | statement SEMI statement_list
-    statement: compound_statement | assignment_statement | empty
-    emtpy:
+    statement_list: statement (SEMI statement)*
+    statement: assignment_statement | compound_statement | empty
+    empty:
     assignment_statement: variable ASSIGN expr
-    expr: term ((PLUS | MINUS) term)*
-    term: factor ((MUL | DIV) factor)*
-    factor: (PLUS, MINUS) factor | INTEGER | LPAREN expr RPAREN | variable
+    expr: term ((PLUS, MINUS) term)*
+    term: factor ((DIV, MULT, FLOAT_DIV) factor)*
+    factor: PLUS factor | MINUS factor | INTEGER | REAL_INTEGER | LPARENT expr RPARENT | variable
     variable: ID
     """
 
@@ -22,9 +26,53 @@ class Parser:
         self.lexer = Lexer(text)
 
     def program(self):
-        node = self.compound_statement()
+        self.match(PROGRAM)
+        self.variable()
+        self.match(SEMI)
+        program = self.block()
         self.match(DOT)
-        return node
+        return program
+
+    def block(self):
+        declarations = self.declarations()
+        compound_statement = self.compound_statement()
+        return Program(declarations, compound_statement)
+
+    def declarations(self) -> list:
+        self.match(VAR)
+        declarations = []
+        while self.lexer.get_current_token().type is ID:
+            declarations.append(self.variable_declaration())
+            self.match(SEMI)
+        return declarations
+
+    def variable_declaration(self):
+        variables = []
+        if self.lexer.get_current_token().type is not ID:
+            self.error('should be ID, got: ' + self.lexer.get_current_token().type)
+
+        variables.append(self.lexer.get_current_token())
+        self.lexer.go_forward()
+
+        while self.lexer.get_current_token().type is COMMA:
+            self.lexer.go_forward()
+            var = self.lexer.get_current_token()
+            if var.type is not ID:
+                self.error('should be ID, got: ' + self.lexer.get_current_token().type)
+            variables.append(var)
+            self.lexer.go_forward()
+
+        self.match(COLON)
+        integer_type = self.integer_type()
+        return VarDecs(variables, integer_type)
+
+    def integer_type(self):
+        token = self.lexer.get_current_token()
+        if token.type in (INTEGER, REAL):
+            self.lexer.go_forward()
+            return token
+
+        self.error('should be integer|real, got ' + token.type)
 
     def compound_statement(self):
         self.match(BEGIN)
@@ -98,7 +146,7 @@ class Parser:
 
     def term(self):
         node = self.factor()
-        while self.lexer.get_current_token().type in (MULT, DIV):
+        while self.lexer.get_current_token().type in (MULT, FLOAT_DIV, INTEGER_DIV):
             current_op_token = self.lexer.get_current_token()
             self.lexer.go_forward()
             node = BinOp(node, current_op_token, self.factor())
@@ -115,6 +163,9 @@ class Parser:
             node = UnaryOp(token, self.factor())
             return node
         elif token.type == INTEGER:
+            self.lexer.go_forward()
+            return Num(token)
+        elif token.type == FLOAT:
             self.lexer.go_forward()
             return Num(token)
         elif token.type is LPARENT:
