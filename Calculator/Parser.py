@@ -6,7 +6,7 @@ from data_classes import *
 # grammar
 # expr: term ([+, -] term)* ;
 # term: factor ([*, /] factor)* ;
-# factor: NUM ('(' + expr + ')')* ;
+# factor: (+, -)factor | NUM | ('(' + expr + ')')* ;
 class Parser:
     def __init__(self, text):
         self.lexer = Lexer(text)
@@ -42,7 +42,15 @@ class Parser:
 
     def factor(self):
         token = self.lexer.get_current_token()
-        if token.type == INTEGER:
+        if token.type is PLUS:
+            self.match(PLUS)
+            node = UnaryOp(token, self.factor())
+            return node
+        elif token.type is MINUS:
+            self.match(MINUS)
+            node = UnaryOp(token, self.factor())
+            return node
+        elif token.type == INTEGER:
             self.lexer.go_forward()
             return Num(token)
         elif token.type is LPARENT:

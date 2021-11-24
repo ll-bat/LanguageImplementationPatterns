@@ -30,6 +30,15 @@ class BinOp(AST):
         return f'BinOp({self.left}, {self.op.type}, {self.right})'
 
 
+class UnaryOp(AST):
+    def __init__(self, op, expr):
+        self.token = self.op = op
+        self.expr = expr
+
+    def __str__(self):
+        return f'UnaryOp({self.op}, {self.expr})'
+
+
 class NodeVisitor(object):
     def visit(self, node):
         class_name = type(node).__name__

@@ -1,4 +1,4 @@
-from data_classes import NodeVisitor, BinOp
+from data_classes import NodeVisitor, BinOp, UnaryOp, Token
 from Constants import *
 
 
@@ -19,6 +19,14 @@ class Interpreter(NodeVisitor):
         }
 
         return types[operator](left, right)
+
+    def visit_UnaryOp(self, node: UnaryOp):
+        op: Token = node.op
+        expr = node.expr
+        if op.type is PLUS:
+            return +self.visit(expr)
+        else:
+            return -self.visit(expr)
 
     @staticmethod
     def visit_Num(node):

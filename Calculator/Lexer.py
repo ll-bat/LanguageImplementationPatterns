@@ -20,10 +20,6 @@ class Lexer:
         if len(self.text) < 1:
             self.error("emtpy text")
 
-        char_token = self.get_current_token()
-        if char_token.type is not INTEGER:
-            self.error("first token error")
-
     def is_pointer_out_of_text(self):
         return self.pos >= len(self.text)
 
