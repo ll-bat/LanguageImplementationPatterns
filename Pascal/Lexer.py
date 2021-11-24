@@ -5,8 +5,16 @@ from data_classes import Token
 class Lexer:
     def __init__(self, text):
         self.reserved_keywords = {
+            PROGRAM: Token(PROGRAM, PROGRAM),
             BEGIN: Token(BEGIN, BEGIN),
             END: Token(END, END),
+            COMMA: Token(COMMA, COMMA),
+            COLON: Token(COLON, COLON),
+            DIV: Token(INTEGER_DIV, INTEGER_DIV),
+            INTEGER: Token(INTEGER, INTEGER),
+            FLOAT: Token(FLOAT, FLOAT),
+            REAL: Token(REAL, REAL),
+            VAR: Token(VAR, VAR)
         }
         self.text = text
         self.pre_run()
@@ -100,6 +108,32 @@ class Lexer:
 
         return Token(ID, result)
 
+    def _number(self):
+        cur_char = self.get_current_character()
+        while True:
+            self.advance()
+            char = self.get_current_character()
+            if self.is_digit(char) or char == '.':
+                cur_char += char
+            else:
+                break
+
+        cnt = cur_char.count('.')
+        if cnt > 1:
+            self.error('incorrect number ' + cur_char)
+
+        if cnt is 0:
+            num = int(cur_char)
+            return Token(INTEGER, num)
+        else:
+            num = float(cur_char)
+            return Token(FLOAT, num)
+
+    def skip_comment(self):
+        while self.get_current_character() != "}":
+            self.advance()
+        self.advance()
+
     def get_next_token(self) -> Token:
         cur_char = self.get_current_character()
         if cur_char is None:
@@ -107,19 +141,10 @@ class Lexer:
             return self.current_token
         if self.is_digit(cur_char):
             # NUMBER
-            while True:
-                self.advance()
-                char = self.get_current_character()
-                if self.is_digit(char):
-                    cur_char += char
-                else:
-                    break
-            num = int(cur_char)
-            self.current_token = Token(INTEGER, num)
+            self.current_token = self._number()
         elif cur_char.isalpha():
             # ID
             self.current_token = self._id()
-            return self.current_token
         elif self.is_operator(cur_char):
             # OPERATOR (+-*/())
             self.advance()
@@ -137,8 +162,19 @@ class Lexer:
             self.advance()
             self.advance()
             self.current_token = Token(ASSIGN, ASSIGN)
+        elif cur_char == "{":
+            self.skip_comment()
+            return self.get_next_token()
+        elif cur_char == ":":
+            self.advance()
+            self.current_token = Token(COLON, COLON)
+        elif cur_char == ',':
+            self.advance()
+            self.current_token = Token(COMMA, COMMA)
         else:
             if cur_char.isspace():
-                self.advance()
+                while self.get_current_character() is not None and self.get_current_character().isspace():
+                    self.advance()
                 return self.get_next_token()
+            self.error('syntax error "' + cur_char + '" is not valid character')
         return self.current_token
