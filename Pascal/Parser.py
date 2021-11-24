@@ -3,11 +3,21 @@ from Constants import *
 from data_classes import *
 
 
-# grammar
-# expr: term ([+, -] term)* ;
-# term: factor ([*, /] factor)* ;
-# factor: (+, -)factor | NUM | ('(' + expr + ')')* ;
 class Parser:
+    """
+    --------- GRAMMAR ---------------
+    program: compound_statement DOT
+    compound_statement: BEGIN statement_list END
+    statement_list: statement | statement SEMI statement_list
+    statement: compound_statement | assignment_statement | empty
+    emtpy:
+    assignment_statement: variable ASSIGN expr
+    expr: term ((PLUS | MINUS) term)*
+    term: factor ((MUL | DIV) factor)*
+    factor: (PLUS, MINUS) factor | INTEGER | LPAREN expr RPAREN | variable
+    variable: ID
+    """
+
     def __init__(self, text):
         self.lexer = Lexer(text)
 
