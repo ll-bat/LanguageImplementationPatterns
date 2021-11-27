@@ -94,6 +94,12 @@ class VarDecs(AST):
         self.variables = variables
         self.token = self.type = integer_type
 
+    def get_declarations(self):
+        return self.variables
+
+    def get_type(self) -> Token:
+        return self.type
+
     def __str__(self):
         res = ""
         for var in self.variables:
@@ -111,3 +117,24 @@ class Program(AST):
         for dec in self.var_decs:
             res += str(dec) + ", "
         return f'Program({res}, {self.compound_statement})'
+
+
+class Symbol:
+    def __init__(self, name, value=None):
+        self.name = name
+        self.value = value
+
+    def __str__(self):
+        return f'Symbol({self.name}, {self.value})'
+
+    __repr__ = __str__
+
+
+class BuiltinTypeSymbol(Symbol):
+    def __init__(self, name):
+        super().__init__(name)
+
+
+class VarSymbol(Symbol):
+    def __init__(self, name, value):
+        super().__init__(name, value)

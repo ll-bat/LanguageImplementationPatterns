@@ -1,3 +1,4 @@
+from SymbolTable import SymbolTable
 from data_classes import *
 from Constants import *
 
@@ -5,7 +6,7 @@ from Constants import *
 class Interpreter(NodeVisitor):
     def __init__(self, tree):
         self.tree = tree
-        self.GLOBAL_VARS = {}
+        self.symbol_table = SymbolTable()
 
     def visit_BinOp(self, node: BinOp):
         left = self.visit(node.left)
@@ -41,14 +42,19 @@ class Interpreter(NodeVisitor):
     def visit_Assign(self, node: Assign):
         var_name = node.left.value
         expr = self.visit(node.right)
-        self.GLOBAL_VARS[var_name] = expr
+
+        if self.symbol_table.is_defined(var_name):
+            return self.symbol_table.assign(var_name, Symbol(var_name, expr))
+        else:
+            raise ValueError(f"value {var_name} is not defined")
 
     def visit_Var(self, node: Var):
         var_name = node.value
-        value = self.GLOBAL_VARS.get(var_name, None)
-        if value is None:
+
+        symbol = self.symbol_table.lookup(var_name)
+        if symbol is None:
             raise SyntaxError("variable '" + var_name + "' is not defined")
-        return value
+        return symbol.value
 
     def visit_NoOp(self, node):
         pass
@@ -59,7 +65,12 @@ class Interpreter(NodeVisitor):
         self.visit(node.compound_statement)
 
     def visit_VarDecs(self, node: VarDecs):
-        pass
+        declarations = node.get_declarations()
+        symbol_type = node.get_type()
+        # print(symbol_type)
+        for var in declarations:
+            symbol = Symbol(var.value, symbol_type.value)
+            self.symbol_table.define(symbol)
 
     def interpret(self):
         return self.visit(self.tree)
