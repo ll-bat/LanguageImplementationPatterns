@@ -4,8 +4,9 @@ from data_classes import Symbol
 
 
 class SymbolTable:
-    def __init__(self):
+    def __init__(self, enclosed_parent=None):
         self._symbols = {}
+        self.enclosed_parent: SymbolTable = enclosed_parent
 
     def defineBuiltinTypeSymbols(self):
         self.define(Symbol(INTEGER))
@@ -23,9 +24,15 @@ class SymbolTable:
     def is_valid_type(self, symbol_type):
         return self.is_defined(symbol_type)
 
-    def lookup(self, var) -> Symbol:
-        var = self._symbols.get(var, None)
-        return var
+    def lookup(self, var) -> Symbol | None:
+        cur_var = self._symbols.get(var, None)
+        if cur_var is not None:
+            return cur_var
+
+        if self.enclosed_parent:
+            return self.enclosed_parent.lookup(var)
+
+        return None
 
     def __str__(self):
         res = ""

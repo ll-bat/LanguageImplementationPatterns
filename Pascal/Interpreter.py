@@ -60,6 +60,14 @@ class Interpreter(NodeVisitor):
         pass
 
     def visit_Program(self, node: Program):
+        nested_symbol_table = SymbolTable(enclosed_parent=None)
+        self.symbol_table = nested_symbol_table
+
+        self.visit(node.block)
+
+        self.symbol_table = self.symbol_table.enclosed_parent
+
+    def visit_Block(self, node: Block):
         for declaration in node.var_decs:
             self.visit(declaration)
         self.visit(node.compound_statement)
@@ -72,8 +80,26 @@ class Interpreter(NodeVisitor):
             symbol = VarSymbol(var.value, symbol_type.value)
             self.symbol_table.define(symbol)
 
+    def visit_VarSymbol(self, node: VarSymbol):
+        self.symbol_table.define(node)
+
     def visit_ProcedureDecl(self, node: ProcedureDecl):
-        pass
+        """
+        Procedure declaration creates a new scope
+        """
+        nested_scope = SymbolTable(enclosed_parent=self.symbol_table)
+        self.symbol_table = nested_scope
+        params = node.params
+        for param in params:
+            self.visit(param)
+
+        block = node.block
+        self.visit(block)
+
+        """
+        when we leave the procedure, the scope is finished as well 
+        """
+        self.symbol_table = self.symbol_table.enclosed_parent
 
     def interpret(self):
         return self.visit(self.tree)

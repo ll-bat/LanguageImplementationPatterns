@@ -108,6 +108,14 @@ class VarDecs(AST):
 
 
 class Program(AST):
+    def __init__(self, block):
+        self.block = block
+
+    def __str__(self):
+        return f'Program({self.block})'
+
+
+class Block(AST):
     def __init__(self, var_decs: list, compound_statement: Compound):
         self.var_decs = var_decs
         self.compound_statement = compound_statement
@@ -120,12 +128,13 @@ class Program(AST):
 
 
 class ProcedureDecl(AST):
-    def __init__(self, proc_name, block):
+    def __init__(self, proc_name, params, block):
         self.name = proc_name
         self.block = block
+        self.params = params if params is not None else []
 
     def __str__(self):
-        return f'ProcedureDecl({self.name}, {self.block})'
+        return f'ProcedureDecl({self.name}, {self.params}, {self.block})'
 
 
 class Symbol:

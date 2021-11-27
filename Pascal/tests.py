@@ -11,17 +11,11 @@ try:
                a, b, c, x : INTEGER;
                y          : REAL;
             
-            PROCEDURE p1;
+            PROCEDURE p1 (a, b : INTEGER; z : REAL);
             VAR 
                 y       : REAL;
-                PROCEDURE p3;
-                VAR 
-                    z   : REAL;
-                BEGIN
-                END;
-                
             BEGIN
-                y := 1
+                c := z
             END;
             
             PROCEDURE p2;

@@ -8,7 +8,9 @@ class Parser:
     --------- GRAMMAR ---------------
     program: PROGRAM variable SEMI block DOT
     block: declarations compound_statement
-    declarations: VAR (variable_declaration SEMI)+ | (PROCEDURE ID SEMI block SEMI  )* | empty
+    declarations: VAR (variable_declaration SEMI)+ | PROCEDURE ID (LPARENT formal_parameter_list RPARENT)? SEMI block SEMI | empty
+    formal_parameter_list: formal_parameter (SEMI format_parameter)*
+    format_parameter: ID (COMMA ID)* COLON integer_type
     variable_declaration: ID (COMMA, ID)* COLON integer_type
     integer_type: INTEGER | REAL
     compound_statement: BEGIN statement_list END
@@ -29,14 +31,14 @@ class Parser:
         self.match(PROGRAM)
         self.variable()
         self.match(SEMI)
-        program = self.block()
+        block = self.block()
         self.match(DOT)
-        return program
+        return Program(block)
 
     def block(self):
         declarations = self.declarations()
         compound_statement = self.compound_statement()
-        return Program(declarations, compound_statement)
+        return Block(declarations, compound_statement)
 
     def declarations(self) -> list:
         declarations = []
@@ -50,10 +52,46 @@ class Parser:
             self.match(PROCEDURE)
             proc_name = self.lexer.get_current_token().value
             self.match(ID)
+
+            parameters_list = []
+            if self.lexer.current_token.type is LPARENT:
+                self.match(LPARENT)
+                parameters_list = self.parameters_list()
+                self.match(RPARENT)
+
             self.match(SEMI)
             block = self.block()
             self.match(SEMI)
-            declarations.append(ProcedureDecl(proc_name, block))
+
+            procedure_decl = ProcedureDecl(proc_name, parameters_list, block)
+            declarations.append(procedure_decl)
+
+        return declarations
+
+    def parameters_list(self) -> list:
+        """
+        ( a , b : INTEGER; c : REAL )
+        """
+
+        declarations = []
+
+        var = self.lexer.get_current_token().value
+        declarations.append(var)
+        self.match(ID)
+
+        while self.lexer.get_current_token().type is COMMA:
+            self.match(COMMA)
+            var = self.lexer.get_current_token().value
+            declarations.append(var)
+            self.match(ID)
+
+        self.match(COLON)
+        integer_type = self.integer_type()
+        declarations = list(map(lambda x: VarSymbol(x, integer_type.value), declarations))
+
+        if self.lexer.get_current_token().type is not RPARENT:
+            self.match(SEMI)
+            declarations.extend(self.parameters_list())
 
         return declarations
 
