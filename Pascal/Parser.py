@@ -1,6 +1,6 @@
 from Lexer import Lexer
 from Constants import *
-from data_classes import *
+from DataClasses import *
 
 
 class Parser:
@@ -15,7 +15,8 @@ class Parser:
     integer_type: INTEGER | REAL
     compound_statement: BEGIN statement_list END
     statement_list: statement (SEMI statement)*
-    statement: assignment_statement | compound_statement | empty
+    statement: assignment_statement | procedure_call | compound_statement | empty
+    procedure_call: ID LPARENT (expr (COMMA expr)*)* RPARENT SEMI
     empty:
     assignment_statement: variable ASSIGN expr
     expr: term ((PLUS, MINUS) term)*
@@ -147,12 +148,41 @@ class Parser:
         if token.type is BEGIN:
             return self.compound_statement()
         elif token.type is ID:
-            return self.assignment_statement()
+            next_token = self.lexer.peek_next_token()
+            if next_token.type is LPARENT:
+                # procedure call
+                return self.procedure_call()
+            else:
+                # assignment
+                return self.assignment_statement()
         elif token.type is END:
             return self.emtpy()
 
         print(token)
         self.error("error in statement")
+
+    def procedure_call(self):
+        """
+        procedure_call: ID LPARENT (expr (COMMA expr)*)* RPARENT
+        """
+        current_token = self.lexer.get_current_token()
+        proc_name = self.lexer.get_current_token().value
+        self.match(ID)
+        self.match(LPARENT)
+        if self.lexer.peek_next_token().type is RPARENT:
+            self.lexer.go_forward()
+            self.match(RPARENT)
+            self.match(SEMI)
+            # no parameters
+            return ProcedureCall(proc_name, [], current_token)
+        else:
+            params = [self.expr()]
+            while self.lexer.get_current_token().type is COMMA:
+                self.match(COMMA)
+                params.append(self.expr())
+            self.match(RPARENT)
+            self.match(SEMI)
+            return ProcedureCall(proc_name, params, current_token)
 
     def assignment_statement(self):
         var = self.variable()
@@ -170,6 +200,7 @@ class Parser:
             self.lexer.go_forward()
             return Var(token)
 
+        print(token)
         self.error("error in variable")
 
     def error(self, message):

@@ -1,5 +1,5 @@
 from SymbolTable import SymbolTable
-from data_classes import *
+from DataClasses import *
 from Constants import *
 
 
@@ -100,6 +100,9 @@ class Interpreter(NodeVisitor):
         when we leave the procedure, the scope is finished as well 
         """
         self.symbol_table = self.symbol_table.enclosed_parent
+
+    def visit_ProcedureCall(self, node: ProcedureCall):
+        pass
 
     def interpret(self):
         return self.visit(self.tree)

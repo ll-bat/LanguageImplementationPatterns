@@ -1,6 +1,6 @@
 from Constants import INTEGER
 from Constants import REAL
-from data_classes import Symbol
+from DataClasses import Symbol
 
 
 class SymbolTable:

@@ -20,6 +20,7 @@ try:
             
             PROCEDURE p2;
             BEGIN
+                p1 (1 + 2, 3);
             END;
             
             BEGIN {Part10}

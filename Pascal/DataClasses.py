@@ -137,6 +137,19 @@ class ProcedureDecl(AST):
         return f'ProcedureDecl({self.name}, {self.params}, {self.block})'
 
 
+class ProcedureCall(AST):
+    def __init__(self, name, actual_params, token):
+        self.name = name
+        self.actual_params = actual_params
+        self.token = token
+
+    def __str__(self):
+        res = ""
+        for param in self.actual_params:
+            res += str(param) + ", "
+        return f'ProcedureCall({self.name}, {res}, {self.token})'
+
+
 class Symbol:
     def __init__(self, name, value=None):
         self.name = name

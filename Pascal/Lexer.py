@@ -1,5 +1,5 @@
 from Constants import *
-from data_classes import Token
+from DataClasses import Token
 
 
 class Lexer:
@@ -45,6 +45,14 @@ class Lexer:
 
     def get_current_token(self):
         return self.current_token
+
+    def peek_next_token(self):
+        cur_pos = self.pos
+        current_token = self.get_current_token()
+        next_token = self.get_next_token()
+        self.pos = cur_pos
+        self.current_token = current_token
+        return next_token
 
     def go_forward(self):
         # this will match next token and save it in current_token variable
