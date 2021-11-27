@@ -69,7 +69,7 @@ class Interpreter(NodeVisitor):
         symbol_type = node.get_type()
         # print(symbol_type)
         for var in declarations:
-            symbol = Symbol(var.value, symbol_type.value)
+            symbol = VarSymbol(var.value, symbol_type.value)
             self.symbol_table.define(symbol)
 
     def visit_ProcedureDecl(self, node: ProcedureDecl):
