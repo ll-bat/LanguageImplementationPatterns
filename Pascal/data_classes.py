@@ -119,6 +119,15 @@ class Program(AST):
         return f'Program({res}, {self.compound_statement})'
 
 
+class ProcedureDecl(AST):
+    def __init__(self, proc_name, block):
+        self.name = proc_name
+        self.block = block
+
+    def __str__(self):
+        return f'ProcedureDecl({self.name}, {self.block})'
+
+
 class Symbol:
     def __init__(self, name, value=None):
         self.name = name

@@ -11,6 +11,23 @@ try:
                a, b, c, x : INTEGER;
                y          : REAL;
             
+            PROCEDURE p1;
+            VAR 
+                y       : REAL;
+                PROCEDURE p3;
+                VAR 
+                    z   : REAL;
+                BEGIN
+                END;
+                
+            BEGIN
+                y := 1
+            END;
+            
+            PROCEDURE p2;
+            BEGIN
+            END;
+            
             BEGIN {Part10}
                BEGIN
                   number := 2;
@@ -36,6 +53,7 @@ try:
 
     parser = Parser(string)
     tree = parser.parse()
+    # print(tree)
     interpreter = Interpreter(tree)
     value = interpreter.interpret()
     print(value)

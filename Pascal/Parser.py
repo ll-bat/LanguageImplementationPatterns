@@ -8,7 +8,7 @@ class Parser:
     --------- GRAMMAR ---------------
     program: PROGRAM variable SEMI block DOT
     block: declarations compound_statement
-    declarations: VAR (variable_declaration SEMI)+ | empty
+    declarations: VAR (variable_declaration SEMI)+ | (PROCEDURE ID SEMI block SEMI  )* | empty
     variable_declaration: ID (COMMA, ID)* COLON integer_type
     integer_type: INTEGER | REAL
     compound_statement: BEGIN statement_list END
@@ -39,11 +39,22 @@ class Parser:
         return Program(declarations, compound_statement)
 
     def declarations(self) -> list:
-        self.match(VAR)
         declarations = []
-        while self.lexer.get_current_token().type is ID:
-            declarations.append(self.variable_declaration())
+        if self.lexer.get_current_token().type is VAR:
+            self.match(VAR)
+            while self.lexer.get_current_token().type is ID:
+                declarations.append(self.variable_declaration())
+                self.match(SEMI)
+
+        while self.lexer.get_current_token().type is PROCEDURE:
+            self.match(PROCEDURE)
+            proc_name = self.lexer.get_current_token().value
+            self.match(ID)
             self.match(SEMI)
+            block = self.block()
+            self.match(SEMI)
+            declarations.append(ProcedureDecl(proc_name, block))
+
         return declarations
 
     def variable_declaration(self):

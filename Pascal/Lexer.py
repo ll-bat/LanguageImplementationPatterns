@@ -14,7 +14,8 @@ class Lexer:
             INTEGER: Token(INTEGER, INTEGER),
             FLOAT: Token(FLOAT, FLOAT),
             REAL: Token(REAL, REAL),
-            VAR: Token(VAR, VAR)
+            VAR: Token(VAR, VAR),
+            PROCEDURE: Token(PROCEDURE, PROCEDURE),
         }
         self.text = text
         self.pre_run()
@@ -122,7 +123,7 @@ class Lexer:
         if cnt > 1:
             self.error('incorrect number ' + cur_char)
 
-        if cnt is 0:
+        if cnt == 0:
             num = int(cur_char)
             return Token(INTEGER, num)
         else:

@@ -72,5 +72,8 @@ class Interpreter(NodeVisitor):
             symbol = Symbol(var.value, symbol_type.value)
             self.symbol_table.define(symbol)
 
+    def visit_ProcedureDecl(self, node: ProcedureDecl):
+        pass
+
     def interpret(self):
         return self.visit(self.tree)
