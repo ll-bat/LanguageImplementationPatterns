@@ -1,7 +1,7 @@
-from constants import *
-from data_classes import Token, Str
-from errors import LexerError, ErrorCode
-from reserved import RESERVED_KEYWORDS
+from utils.constants import *
+from utils.data_classes import Token
+from utils.errors import LexerError, ErrorCode
+from system.reserved import RESERVED_KEYWORDS
 
 
 class Lexer:

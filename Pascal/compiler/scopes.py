@@ -1,4 +1,4 @@
-from symbol_table import SymbolTable
+from compiler.symbol_table import SymbolTable
 
 
 class NestedScopeable:

@@ -1,8 +1,7 @@
-import symbol_table
-from Parser import Parser
-from interpreter import Interpreter
-from errors import *
-from semantic_analyzer import SemanticAnalyzer
+from compiler.parser import Parser
+from compiler.interpreter import Interpreter
+from utils.errors import *
+from compiler.semantic_analyzer import SemanticAnalyzer
 
 try:
     string = """

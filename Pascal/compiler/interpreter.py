@@ -1,11 +1,10 @@
 from typing import List
-
-from errors import InterpreterError, ErrorCode
-from builtin_functions.main import is_system_function, call_system_function
-from scopes import NestedScopeable
-from symbol_table import SymbolTable
-from data_classes import *
-from constants import *
+from utils.errors import InterpreterError, ErrorCode
+from system.builtin_functions.main import is_system_function, call_system_function
+from compiler.scopes import NestedScopeable
+from compiler.symbol_table import SymbolTable
+from utils.data_classes import *
+from utils.constants import *
 
 
 class Interpreter(NodeVisitor, NestedScopeable):

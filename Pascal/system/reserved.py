@@ -1,5 +1,5 @@
-from constants import *
-from data_classes import Token
+from utils.constants import *
+from utils.data_classes import Token
 
 RESERVED_KEYWORDS = {
     PROGRAM: Token(PROGRAM, PROGRAM),

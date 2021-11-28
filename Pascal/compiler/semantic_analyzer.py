@@ -1,8 +1,8 @@
-from constants import PLUS
-from builtin_functions.main import is_system_function
-from data_classes import *
-from errors import SemanticError, ErrorCode
-from symbol_table import SymbolTable
+from utils.constants import PLUS
+from system.builtin_functions.main import is_system_function
+from utils.data_classes import *
+from utils.errors import SemanticError, ErrorCode
+from compiler.symbol_table import SymbolTable
 
 
 class SemanticAnalyzer(NodeVisitor):
