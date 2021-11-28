@@ -1,5 +1,6 @@
 from typing import List
 
+from errors import InterpreterError, ErrorCode
 from builtin_functions.main import is_system_function, call_system_function
 from scopes import NestedScopeable
 from symbol_table import SymbolTable
@@ -13,7 +14,7 @@ class Interpreter(NodeVisitor, NestedScopeable):
         super().__init__(SymbolTable())
 
     def error(self, message):
-        pass
+        raise InterpreterError(ErrorCode.INTERPRETER_ERROR, "can only concatenate strings")
 
     def visit_BinOp(self, node: BinOp):
         left = self.visit(node.left)
@@ -41,6 +42,19 @@ class Interpreter(NodeVisitor, NestedScopeable):
     @staticmethod
     def visit_Num(node: Num):
         return node.value
+
+    @staticmethod
+    def visit_Str(node: Str):
+        return node.value
+
+    def visit_StrOp(self, node: StrOp):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+
+        if type(left) is not str or type(right) is not str:
+            self.error("can only concatenate string and string")
+
+        return left + right
 
     def visit_Compound(self, node: Compound):
         for sub_node in node.get_children():

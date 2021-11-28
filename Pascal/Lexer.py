@@ -1,5 +1,5 @@
 from constants import *
-from data_classes import Token
+from data_classes import Token, Str
 from errors import LexerError, ErrorCode
 from reserved import RESERVED_KEYWORDS
 
@@ -110,6 +110,16 @@ class Lexer:
 
         return Token(ID, result)
 
+    def _string(self):
+        cur_char = self.get_current_character()
+        string = ""
+        self.advance()
+        while self.get_current_character() != cur_char:
+            string += self.get_current_character()
+            self.advance()
+        self.advance()
+        return Token(STRING, string)
+
     def _number(self):
         cur_char = self.get_current_character()
         while True:
@@ -144,6 +154,10 @@ class Lexer:
         if self.is_digit(cur_char):
             # NUMBER
             self.current_token = self._number()
+            return self.current_token
+        elif cur_char in ("'", '"'):
+            # STRING
+            self.current_token = self._string()
             return self.current_token
         elif cur_char.isalpha():
             # ID

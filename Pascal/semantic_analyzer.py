@@ -1,3 +1,4 @@
+from constants import PLUS
 from builtin_functions.main import is_system_function
 from data_classes import *
 from errors import SemanticError, ErrorCode
@@ -27,6 +28,16 @@ class SemanticAnalyzer(NodeVisitor):
     @staticmethod
     def visit_Num(node: Num):
         pass
+
+    @staticmethod
+    def visit_Str(node: Str):
+        pass
+
+    def visit_StrOp(self, node: StrOp):
+        self.visit(node.left)
+        if node.add.type is not PLUS:
+            self.error(ErrorCode.SEMANTIC_ERROR, "only '+' sign can be used for strings' concatenation")
+        self.visit(node.right)
 
     def visit_Compound(self, node: Compound):
         for sub_node in node.get_children():

@@ -7,6 +7,8 @@ class ErrorCode(Enum):
     DUPLICATE_ID = "Duplicate id found"
     LEXER_ERROR = "Lexer error"
     PARSER_ERROR = "Parser error"
+    SEMANTIC_ERROR = "Semantic error"
+    INTERPRETER_ERROR = "Interpreter error"
     NUMBER_OF_ARGUMENTS_MISMATCH_ERROR = "Arguments error"
 
 
@@ -28,4 +30,8 @@ class ParserError(Error):
 
 
 class SemanticError(Error):
+    pass
+
+
+class InterpreterError(Error):
     pass

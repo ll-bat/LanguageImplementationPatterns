@@ -12,14 +12,16 @@ class Parser:
     declarations: VAR (variable_declaration SEMI)+ | PROCEDURE ID (LPARENT formal_parameter_list RPARENT)? SEMI block SEMI | empty
     formal_parameter_list: formal_parameter (SEMI format_parameter)*
     format_parameter: ID (COMMA ID)* COLON integer_type
-    variable_declaration: ID (COMMA, ID)* COLON integer_type
-    integer_type: INTEGER | REAL
+    variable_declaration: ID (COMMA, ID)* COLON base_type
+    base_type: INTEGER | REAL | STRING
     compound_statement: BEGIN statement_list END
     statement_list: statement (SEMI statement)*
     statement: assignment_statement | procedure_call | compound_statement | empty
-    procedure_call: ID LPARENT (expr (COMMA expr)*)* RPARENT SEMI
+    procedure_call: ID LPARENT (base_expr (COMMA base_expr)*)* RPARENT SEMI
     empty:
-    assignment_statement: variable ASSIGN expr
+    assignment_statement: variable ASSIGN base_expr
+    base_expr: (expr|str_expr)
+    str_expr: STRING (PLUS (STRING|variable))*
     expr: term ((PLUS, MINUS) term)*
     term: factor ((DIV, MULT, FLOAT_DIV) factor)*
     factor: PLUS factor | MINUS factor | INTEGER | REAL_INTEGER | LPARENT expr RPARENT | variable
@@ -88,8 +90,8 @@ class Parser:
             self.match(ID)
 
         self.match(COLON)
-        integer_type = self.integer_type()
-        declarations = list(map(lambda x: VarSymbol(x, integer_type.value), declarations))
+        base_type = self.base_type()
+        declarations = list(map(lambda x: VarSymbol(x, base_type.value), declarations))
 
         if self.lexer.get_current_token().type is not RPARENT:
             self.match(SEMI)
@@ -114,8 +116,16 @@ class Parser:
             self.lexer.go_forward()
 
         self.match(COLON)
-        integer_type = self.integer_type()
-        return VarDecs(variables, integer_type)
+        base_type = self.base_type()
+        return VarDecs(variables, base_type)
+
+    def base_type(self):
+        token = self.lexer.get_current_token()
+        if token.type in (INTEGER, REAL, STRING):
+            self.lexer.go_forward()
+            return token
+
+        self.error('should be integer|real|string, got ' + token.type)
 
     def integer_type(self):
         token = self.lexer.get_current_token()
@@ -164,7 +174,7 @@ class Parser:
 
     def procedure_call(self):
         """
-        procedure_call: ID LPARENT (expr (COMMA expr)*)* RPARENT
+        procedure_call: ID LPARENT (base_expr (COMMA base_expr)*)* RPARENT
         """
         current_token = self.lexer.get_current_token()
         proc_name = self.lexer.get_current_token().value
@@ -175,18 +185,40 @@ class Parser:
             # no parameters
             return ProcedureCall(proc_name, [], current_token)
         else:
-            params = [self.expr()]
+            params = [self.base_expr()]
             while self.lexer.get_current_token().type is COMMA:
                 self.match(COMMA)
-                params.append(self.expr())
+                params.append(self.base_expr())
             self.match(RPARENT)
             return ProcedureCall(proc_name, params, current_token)
 
     def assignment_statement(self):
         var = self.variable()
         self.match(ASSIGN)
-        expr = self.expr()
-        return Assign(var, Token(ASSIGN, Assign), expr)
+        base_expr = self.base_expr()
+        return Assign(var, Token(ASSIGN, Assign), base_expr)
+
+    def base_expr(self):
+        if self.lexer.get_current_token().type is STRING:
+            return self.str_expr()
+        else:
+            return self.expr()
+
+    def str_expr(self):
+        var = self.lexer.current_token
+        if var.type is STRING:
+            var = Str(var)
+        elif var.type is ID:
+            var = Var(var)
+        else:
+            self.error("string assignment can only contain string literals")
+
+        self.lexer.go_forward()
+        while self.lexer.get_current_token().type is PLUS:
+            self.match(PLUS)
+            var = StrOp(var, Token(PLUS, PLUS), self.str_expr())
+
+        return var
 
     @staticmethod
     def emtpy():

@@ -11,12 +11,15 @@ try:
                number     : INTEGER;
                a, b, c, x : INTEGER;
                y          : REAL;
+               s          : STRING;
 
             PROCEDURE p1 (a, b : INTEGER);
             BEGIN
+                s := "something";
                 y := 222;
                 c := a + b;
                 print(c);
+                print("print" + " " + s, "really", "interesting");
             END;
 
             PROCEDURE p2;
@@ -67,3 +70,6 @@ try:
     interpreter.interpret()
 except (ParserError, SemanticError, LexerError) as ex:
     print(ex)
+except Exception as e:
+    print(e)
+

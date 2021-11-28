@@ -31,6 +31,25 @@ class Num(AST):
         return f'Num({self.token.type}, {self.value})'
 
 
+class Str(AST):
+    def __init__(self, token: Token):
+        self.token = token
+        self.value = token.value
+
+    def __str__(self):
+        return f'Str({self.value})'
+
+
+class StrOp(AST):
+    def __init__(self, left, add: Token, right):
+        self.left = left
+        self.add = add
+        self.right = right
+
+    def __str__(self):
+        return f'StrOp({self.left}, {self.add}, {self.right})'
+
+
 class BinOp(AST):
     def __init__(self, left, op: Token, right):
         self.left = left
@@ -93,9 +112,9 @@ class NoOp(AST):
 
 
 class VarDecs(AST):
-    def __init__(self, variables, integer_type: Token):
+    def __init__(self, variables, base_type: Token):
         self.variables = variables
-        self.token = self.type = integer_type
+        self.token = self.type = base_type
 
     def get_declarations(self):
         return self.variables
