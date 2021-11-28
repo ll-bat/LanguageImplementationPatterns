@@ -2,6 +2,7 @@ from Parser import Parser
 from Interpreter import Interpreter
 from Constants import *
 from Lexer import Lexer
+from SemanticAnalyzer import SemanticAnalyzer
 
 try:
     string = """
@@ -49,6 +50,12 @@ try:
     parser = Parser(string)
     tree = parser.parse()
     # print(tree)
+
+    # check for errors
+    semantic_analyzer = SemanticAnalyzer(tree)
+    semantic_analyzer.analyze()
+
+    # interpret language
     interpreter = Interpreter(tree)
     value = interpreter.interpret()
     print(value)
