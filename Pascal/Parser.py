@@ -170,10 +170,8 @@ class Parser:
         proc_name = self.lexer.get_current_token().value
         self.match(ID)
         self.match(LPARENT)
-        if self.lexer.peek_next_token().type is RPARENT:
-            self.lexer.go_forward()
+        if self.lexer.get_current_token().type is RPARENT:
             self.match(RPARENT)
-            self.match(SEMI)
             # no parameters
             return ProcedureCall(proc_name, [], current_token)
         else:
@@ -182,7 +180,6 @@ class Parser:
                 self.match(COMMA)
                 params.append(self.expr())
             self.match(RPARENT)
-            self.match(SEMI)
             return ProcedureCall(proc_name, params, current_token)
 
     def assignment_statement(self):

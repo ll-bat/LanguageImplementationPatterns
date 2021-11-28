@@ -1,7 +1,8 @@
+import symbol_table
 from Parser import Parser
 from interpreter import Interpreter
-from constants import *
-from Lexer import Lexer
+from errors import *
+from semantic_analyzer import SemanticAnalyzer
 
 try:
     string = """
@@ -11,15 +12,34 @@ try:
                a, b, c, x : INTEGER;
                y          : REAL;
 
+            PROCEDURE p1 (a, b : INTEGER);
+            BEGIN
+                y := 222;
+                c := a + b;
+                print(c);
+            END;
+
+            PROCEDURE p2;
+            BEGIN
+                print(y);
+            END;
+
             BEGIN {Part10}
                BEGIN
                   number := 2;
                   a := number;
                   b := 10 * a + 10 * number DIV 4;
-                  c := a - - b
+                  c := a - - b;
+                  p1 (1 + 2, 3);
                END;
-               x := 11;
+
+               p2();
+
+               x := 11;               
                y := 20 / 7 + 3.14;
+
+               p2();
+
                { writeln('a = ', a); }
                { writeln('b = ', b); }
                { writeln('c = ', c); }
@@ -36,8 +56,14 @@ try:
 
     parser = Parser(string)
     tree = parser.parse()
+    # print(tree)
+
+    # check for errors
+    semantic_analyzer = SemanticAnalyzer(tree)
+    semantic_analyzer.analyze()
+
+    # interpret language
     interpreter = Interpreter(tree)
-    value = interpreter.interpret()
-    print(value)
-except SyntaxError as ex:
-    print(ex.msg)
+    interpreter.interpret()
+except (ParserError, SemanticError, LexerError) as ex:
+    print(ex)

@@ -1,4 +1,6 @@
 from typing import List
+
+from builtin_functions.main import is_system_function, call_system_function
 from scopes import NestedScopeable
 from symbol_table import SymbolTable
 from data_classes import *
@@ -92,6 +94,14 @@ class Interpreter(NodeVisitor, NestedScopeable):
         self.symbol_table.define(node)
 
     def visit_ProcedureCall(self, node: ProcedureCall):
+        if self.symbol_table.is_defined(node.name) is False:
+            # system function call
+            if is_system_function(node.name):
+                params = [self.visit(param) for param in node.actual_params]
+                return call_system_function(node.name, *params)
+            else:
+                raise NameError("no such procedure: " + node.name)
+
         procedure: ProcedureDecl = self.symbol_table.lookup(node.name)
         parameter_names: List[Symbol] = procedure.params
         parameter_values = node.actual_params
@@ -106,7 +116,6 @@ class Interpreter(NodeVisitor, NestedScopeable):
         block = procedure.block
         self.visit(block)
         self.destroy_current_scope()
-        print(self.symbol_table)
 
     def interpret(self):
         return self.visit(self.tree)

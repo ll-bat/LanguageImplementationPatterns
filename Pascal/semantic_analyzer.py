@@ -1,3 +1,4 @@
+from builtin_functions.main import is_system_function
 from data_classes import *
 from errors import SemanticError, ErrorCode
 from symbol_table import SymbolTable
@@ -101,6 +102,8 @@ class SemanticAnalyzer(NodeVisitor):
                 self.error(ErrorCode.NUMBER_OF_ARGUMENTS_MISMATCH_ERROR,
                            "Number of arguments passed does not match "
                            "with the procedure arguments count")
+        elif is_system_function(node.name):
+            pass
         else:
             self.error(ErrorCode.ID_NOT_FOUND, "procedure {} is not defined".format(node.name))
 

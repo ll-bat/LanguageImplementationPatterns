@@ -15,12 +15,13 @@ try:
             PROCEDURE p1 (a, b : INTEGER);
             BEGIN
                 y := 222;
-                c := a + b
+                c := a + b;
+                print(c);
             END;
-            
+                        
             PROCEDURE p2;
             BEGIN
-                
+                print(y);
             END;
             
             BEGIN {Part10}
@@ -31,8 +32,14 @@ try:
                   c := a - - b;
                   p1 (1 + 2, 3);
                END;
-               x := 11;
+                              
+               p2();
+               
+               x := 11;               
                y := 20 / 7 + 3.14;
+               
+               p2();
+               
                { writeln('a = ', a); }
                { writeln('b = ', b); }
                { writeln('c = ', c); }
@@ -57,7 +64,6 @@ try:
 
     # interpret language
     interpreter = Interpreter(tree)
-    value = interpreter.interpret()
-    print(value)
+    interpreter.interpret()
 except (ParserError, SemanticError, LexerError) as ex:
     print(ex)
