@@ -13,10 +13,9 @@ try:
                y          : REAL;
             
             PROCEDURE p1 (a, b : INTEGER);
-            VAR 
-                y       : REAL;
             BEGIN
-                c := z
+                y := 222;
+                c := a + b
             END;
             
             PROCEDURE p2;

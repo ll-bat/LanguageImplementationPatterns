@@ -1,14 +1,14 @@
 from typing import List
-
+from scopes import NestedScopeable
 from symbol_table import SymbolTable
 from data_classes import *
 from constants import *
 
 
-class Interpreter(NodeVisitor):
+class Interpreter(NodeVisitor, NestedScopeable):
     def __init__(self, tree):
         self.tree = tree
-        self.symbol_table = SymbolTable()
+        super().__init__(SymbolTable())
 
     def error(self, message):
         pass
@@ -99,9 +99,14 @@ class Interpreter(NodeVisitor):
         for var, val in zip(parameter_names, parameter_values):
             params[var.name] = self.visit(val)
 
-        # self.define_new_scope()
+        self.define_new_scope()
         for param, item in params.items():
-            print(param, item)
+            self.symbol_table.define(Symbol(param, item))
+
+        block = procedure.block
+        self.visit(block)
+        self.destroy_current_scope()
+        print(self.symbol_table)
 
     def interpret(self):
         return self.visit(self.tree)

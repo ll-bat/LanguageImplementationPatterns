@@ -7,6 +7,9 @@ class SymbolTable:
         self._symbols = {}
         self.enclosed_parent: SymbolTable = enclosed_parent
 
+    def get_symbols(self):
+        return self._symbols
+
     def defineBuiltinTypeSymbols(self):
         self.define(Symbol(INTEGER))
         self.define(Symbol(REAL))
@@ -14,8 +17,21 @@ class SymbolTable:
     def define(self, symbol: AbstractSymbol):
         self._symbols[symbol.name] = symbol
 
+    def get_var_scope(self, scope, var: str):
+        if scope is None:
+            raise ValueError("can't find scope for " + var)
+
+        if var in scope.get_symbols():
+            return scope
+
+        return self.get_var_scope(self.enclosed_parent, var)
+
     def assign(self, var: str, value: Symbol):
-        self._symbols[var] = value
+        if var in self._symbols:
+            self._symbols[var] = value
+        else:
+            scope: SymbolTable = self.get_var_scope(self, var)
+            scope.assign(var, value)
 
     def is_defined(self, var):
         return self.lookup(var) is not None
