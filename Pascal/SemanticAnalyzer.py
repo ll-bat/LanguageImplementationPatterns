@@ -1,4 +1,5 @@
 from DataClasses import *
+from Errors import SemanticError, ErrorCode
 from SymbolTable import SymbolTable
 
 
@@ -6,6 +7,12 @@ class SemanticAnalyzer(NodeVisitor):
     def __init__(self, tree):
         self.tree = tree
         self.symbol_table = SymbolTable()
+
+    def error(self, error_code, message):
+        raise SemanticError(
+            error_code=error_code,
+            message=f'{error_code.value} -> {message}',
+        )
 
     def visit_BinOp(self, node: BinOp):
         self.visit(node.left)
@@ -31,12 +38,12 @@ class SemanticAnalyzer(NodeVisitor):
         if self.symbol_table.is_defined(var_name):
             return None
         else:
-            raise ValueError(f"value {var_name} is not defined")
+            self.error(error_code=ErrorCode.ID_NOT_FOUND, message=f"value {var_name} is not defined")
 
     def visit_Var(self, node: Var):
         var_name = node.value
         if self.symbol_table.is_defined(var_name) is None:
-            raise ValueError("variable '" + var_name + "' is not defined")
+            self.error(error_code=ErrorCode.ID_NOT_FOUND, message=f"value {var_name} is not defined")
 
     def visit_NoOp(self, node):
         pass

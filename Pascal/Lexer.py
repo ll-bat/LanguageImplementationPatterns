@@ -1,5 +1,6 @@
 from Constants import *
 from DataClasses import Token
+from Errors import LexerError, ErrorCode
 from reserved import RESERVED_KEYWORDS
 
 
@@ -7,10 +8,17 @@ class Lexer:
     def __init__(self, text):
         self.pos = 0
         self.text = text
+        self.lineno = 1
+        self.column = 1
         self.current_token = self.get_next_token()
 
     def error(self, message):
-        raise SyntaxError(message)
+        s = f'Lexer error on {self.get_current_character()};' \
+            f' line: {self.lineno};' \
+            f' column: {self.column} ' \
+            f' message: {message}'
+
+        raise LexerError(ErrorCode, s)
 
     def is_pointer_out_of_text(self, pos=None):
         if pos is None:
@@ -74,6 +82,12 @@ class Lexer:
         return element_type
 
     def advance(self):
+        if self.get_current_character() == '\n':
+            self.lineno += 1
+            self.column = 1
+        else:
+            self.column += 1
+
         self.pos = self.pos + 1
 
     def peek(self):

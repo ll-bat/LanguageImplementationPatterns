@@ -1,6 +1,7 @@
 from Lexer import Lexer
 from Constants import *
 from DataClasses import *
+from Errors import ParserError, ErrorCode
 
 
 class Parser:
@@ -203,8 +204,14 @@ class Parser:
         print(token)
         self.error("error in variable")
 
-    def error(self, message):
-        raise SyntaxError(message)
+    @staticmethod
+    def error(message, error_code=None):
+        if error_code is None:
+            error_code = ErrorCode.PARSER_ERROR
+        raise ParserError(
+            error_code=error_code,
+            message=f'{error_code.value} -> {message}',
+        )
 
     def match(self, token_type: str):
         token = self.lexer.get_current_token()
