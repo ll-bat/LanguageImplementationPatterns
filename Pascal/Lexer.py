@@ -1,38 +1,16 @@
 from Constants import *
 from DataClasses import Token
+from reserved import RESERVED_KEYWORDS
 
 
 class Lexer:
     def __init__(self, text):
-        self.reserved_keywords = {
-            PROGRAM: Token(PROGRAM, PROGRAM),
-            BEGIN: Token(BEGIN, BEGIN),
-            END: Token(END, END),
-            COMMA: Token(COMMA, COMMA),
-            COLON: Token(COLON, COLON),
-            DIV: Token(INTEGER_DIV, INTEGER_DIV),
-            INTEGER: Token(INTEGER, INTEGER),
-            FLOAT: Token(FLOAT, FLOAT),
-            REAL: Token(REAL, REAL),
-            VAR: Token(VAR, VAR),
-            PROCEDURE: Token(PROCEDURE, PROCEDURE),
-        }
-        self.text = text
-        self.pre_run()
         self.pos = 0
+        self.text = text
         self.current_token = self.get_next_token()
-        self.validate()
-
-    def pre_run(self):
-        # self.text = self.text.replace(" ", "")
-        pass
 
     def error(self, message):
         raise SyntaxError(message)
-
-    def validate(self):
-        if len(self.text) < 1:
-            self.error("emtpy text")
 
     def is_pointer_out_of_text(self, pos=None):
         if pos is None:
@@ -103,8 +81,9 @@ class Lexer:
             return None
         return self.get_character(self.get_position() + 1)
 
-    def get_reserved_keyword_token(self, token_type):
-        return self.reserved_keywords.get(token_type)
+    @staticmethod
+    def get_reserved_keyword_token(token_type):
+        return RESERVED_KEYWORDS.get(token_type)
 
     def _id(self):
         result = ""
@@ -112,7 +91,7 @@ class Lexer:
             result += self.get_current_character()
             self.advance()
 
-        if result in self.reserved_keywords:
+        if result in RESERVED_KEYWORDS:
             return self.get_reserved_keyword_token(result)
 
         return Token(ID, result)
