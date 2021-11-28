@@ -1,6 +1,6 @@
-from Constants import *
-from DataClasses import Token
-from Errors import LexerError, ErrorCode
+from constants import *
+from data_classes import Token
+from errors import LexerError, ErrorCode
 from reserved import RESERVED_KEYWORDS
 
 

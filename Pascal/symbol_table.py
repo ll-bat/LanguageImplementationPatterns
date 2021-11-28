@@ -1,6 +1,5 @@
-from Constants import INTEGER
-from Constants import REAL
-from DataClasses import Symbol, AbstractSymbol
+from constants import *
+from data_classes import *
 
 
 class SymbolTable:
@@ -24,7 +23,7 @@ class SymbolTable:
     def is_valid_type(self, symbol_type):
         return self.is_defined(symbol_type)
 
-    def lookup(self, var) -> Symbol | None:
+    def lookup(self, var):
         cur_var = self._symbols.get(var, None)
         if cur_var is not None:
             return cur_var

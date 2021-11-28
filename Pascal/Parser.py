@@ -1,7 +1,7 @@
 from Lexer import Lexer
-from Constants import *
-from DataClasses import *
-from Errors import ParserError, ErrorCode
+from constants import *
+from data_classes import *
+from errors import ParserError, ErrorCode
 
 
 class Parser:

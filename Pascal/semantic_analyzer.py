@@ -1,6 +1,6 @@
-from DataClasses import *
-from Errors import SemanticError, ErrorCode
-from SymbolTable import SymbolTable
+from data_classes import *
+from errors import SemanticError, ErrorCode
+from symbol_table import SymbolTable
 
 
 class SemanticAnalyzer(NodeVisitor):
@@ -90,8 +90,19 @@ class SemanticAnalyzer(NodeVisitor):
         """
         self.symbol_table = self.symbol_table.enclosed_parent
 
+        self.symbol_table.define(node)
+
     def visit_ProcedureCall(self, node: ProcedureCall):
-        pass
+        if self.symbol_table.is_defined(node.name):
+            procedure: ProcedureDecl = self.symbol_table.lookup(node.name)
+            parameter_names = procedure.params
+            parameter_values = node.actual_params
+            if len(parameter_names) != len(parameter_values):
+                self.error(ErrorCode.NUMBER_OF_ARGUMENTS_MISMATCH_ERROR,
+                           "Number of arguments passed does not match "
+                           "with the procedure arguments count")
+        else:
+            self.error(ErrorCode.ID_NOT_FOUND, "procedure {} is not defined".format(node.name))
 
     def analyze(self):
         return self.visit(self.tree)

@@ -1,8 +1,8 @@
+import symbol_table
 from Parser import Parser
-from Interpreter import Interpreter
-from Constants import *
-from Lexer import Lexer
-from SemanticAnalyzer import SemanticAnalyzer
+from interpreter import Interpreter
+from errors import *
+from semantic_analyzer import SemanticAnalyzer
 
 try:
     string = """
@@ -12,7 +12,7 @@ try:
                a, b, c, x : INTEGER;
                y          : REAL;
             
-            PROCEDURE p1 (a, b : INTEGER; z : REAL);
+            PROCEDURE p1 (a, b : INTEGER);
             VAR 
                 y       : REAL;
             BEGIN
@@ -60,5 +60,5 @@ try:
     interpreter = Interpreter(tree)
     value = interpreter.interpret()
     print(value)
-except SyntaxError as ex:
-    print(ex.msg)
+except (ParserError, SemanticError, LexerError) as ex:
+    print(ex)

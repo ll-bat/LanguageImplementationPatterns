@@ -7,6 +7,7 @@ class ErrorCode(Enum):
     DUPLICATE_ID = "Duplicate id found"
     LEXER_ERROR = "Lexer error"
     PARSER_ERROR = "Parser error"
+    NUMBER_OF_ARGUMENTS_MISMATCH_ERROR = "Arguments error"
 
 
 class Error(Exception):

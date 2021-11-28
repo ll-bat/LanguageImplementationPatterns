@@ -1,12 +1,17 @@
-from SymbolTable import SymbolTable
-from DataClasses import *
-from Constants import *
+from typing import List
+
+from symbol_table import SymbolTable
+from data_classes import *
+from constants import *
 
 
 class Interpreter(NodeVisitor):
     def __init__(self, tree):
         self.tree = tree
         self.symbol_table = SymbolTable()
+
+    def error(self, message):
+        pass
 
     def visit_BinOp(self, node: BinOp):
         left = self.visit(node.left)
@@ -87,7 +92,16 @@ class Interpreter(NodeVisitor):
         self.symbol_table.define(node)
 
     def visit_ProcedureCall(self, node: ProcedureCall):
-        print(self.symbol_table)
+        procedure: ProcedureDecl = self.symbol_table.lookup(node.name)
+        parameter_names: List[Symbol] = procedure.params
+        parameter_values = node.actual_params
+        params = {}
+        for var, val in zip(parameter_names, parameter_values):
+            params[var.name] = self.visit(val)
+
+        # self.define_new_scope()
+        for param, item in params.items():
+            print(param, item)
 
     def interpret(self):
         return self.visit(self.tree)

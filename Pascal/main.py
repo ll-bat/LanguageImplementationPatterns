@@ -1,6 +1,6 @@
 from Parser import Parser
-from Interpreter import Interpreter
-from Constants import *
+from interpreter import Interpreter
+from constants import *
 from Lexer import Lexer
 
 try:
