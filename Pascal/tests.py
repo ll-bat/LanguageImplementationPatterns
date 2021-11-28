@@ -21,7 +21,7 @@ try:
             
             PROCEDURE p2;
             BEGIN
-                p1 (1 + 2, 3);
+                
             END;
             
             BEGIN {Part10}
@@ -29,7 +29,8 @@ try:
                   number := 2;
                   a := number;
                   b := 10 * a + 10 * number DIV 4;
-                  c := a - - b
+                  c := a - - b;
+                  p1 (1 + 2, 3);
                END;
                x := 11;
                y := 20 / 7 + 3.14;

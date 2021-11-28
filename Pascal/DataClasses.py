@@ -1,3 +1,6 @@
+import abc
+
+
 class Token:
     def __init__(self, token_type, value):
         self.type = token_type
@@ -127,8 +130,20 @@ class Block(AST):
         return f'Program({res}, {self.compound_statement})'
 
 
-class ProcedureDecl(AST):
+class AbstractSymbol(abc.ABC):
+    def __init__(self, name, *args):
+        self.name = name
+
+    def is_symbol(self):
+        return isinstance(self, Symbol)
+
+    def is_procedure(self):
+        return isinstance(self, ProcedureDecl)
+
+
+class ProcedureDecl(AbstractSymbol):
     def __init__(self, proc_name, params, block):
+        super(ProcedureDecl, self).__init__(proc_name)
         self.name = proc_name
         self.block = block
         self.params = params if params is not None else []
@@ -150,8 +165,9 @@ class ProcedureCall(AST):
         return f'ProcedureCall({self.name}, {res}, {self.token})'
 
 
-class Symbol:
+class Symbol(AbstractSymbol):
     def __init__(self, name, value=None):
+        super().__init__(name)
         self.name = name
         self.value = value
 
@@ -161,11 +177,11 @@ class Symbol:
     __repr__ = __str__
 
 
-class BuiltinTypeSymbol(Symbol):
-    def __init__(self, name):
-        super().__init__(name)
-
-
 class VarSymbol(Symbol):
     def __init__(self, name, value):
         super().__init__(name, value)
+
+
+class BuiltinTypeSymbol(Symbol):
+    def __init__(self, name):
+        super().__init__(name)

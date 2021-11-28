@@ -1,6 +1,6 @@
 from Constants import INTEGER
 from Constants import REAL
-from DataClasses import Symbol
+from DataClasses import Symbol, AbstractSymbol
 
 
 class SymbolTable:
@@ -12,7 +12,7 @@ class SymbolTable:
         self.define(Symbol(INTEGER))
         self.define(Symbol(REAL))
 
-    def define(self, symbol: Symbol):
+    def define(self, symbol: AbstractSymbol):
         self._symbols[symbol.name] = symbol
 
     def assign(self, var: str, value: Symbol):

@@ -84,25 +84,10 @@ class Interpreter(NodeVisitor):
         self.symbol_table.define(node)
 
     def visit_ProcedureDecl(self, node: ProcedureDecl):
-        """
-        Procedure declaration creates a new scope
-        """
-        nested_scope = SymbolTable(enclosed_parent=self.symbol_table)
-        self.symbol_table = nested_scope
-        params = node.params
-        for param in params:
-            self.visit(param)
-
-        block = node.block
-        self.visit(block)
-
-        """
-        when we leave the procedure, the scope is finished as well 
-        """
-        self.symbol_table = self.symbol_table.enclosed_parent
+        self.symbol_table.define(node)
 
     def visit_ProcedureCall(self, node: ProcedureCall):
-        pass
+        print(self.symbol_table)
 
     def interpret(self):
         return self.visit(self.tree)
